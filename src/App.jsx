@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Cake, Scissors, X, ArrowRight } from 'lucide-react';
+// Import the confetti library
+import confetti from 'canvas-confetti';
 
 // Main App Component
 const App = () => {
@@ -12,19 +14,16 @@ const App = () => {
   const [displayedHeaderText, setDisplayedHeaderText] = useState('');
   const [typingComplete, setTypingComplete] = useState(false);
 
-  // Placeholder for the cover image (Replace this URL with the base64 data for image_6bedbe.png)
+  // Placeholder for the cover image
   const coverImageUrl = "https://i.postimg.cc/J0vh5949/image.png";
   
   // --- Typing Effect Logic ---
   useEffect(() => {
-    // Only run the typing effect if the cover page is closed
     if (!showCoverPage) {
-      
-      // Fix: Instantly display the first character to prevent clipping/missing start.
       setDisplayedHeaderText(fullHeaderText.charAt(0)); 
       
-      let index = 1; // Start the loop from the second character
-      const speed = 50; // milliseconds per character
+      let index = 1; 
+      const speed = 50; 
   
       const intervalId = setInterval(() => {
         if (index < fullHeaderText.length) {
@@ -38,42 +37,50 @@ const App = () => {
   
       return () => clearInterval(intervalId);
     }
-  }, [showCoverPage]); // Start typing effect when cover page is hidden
+  }, [showCoverPage]); 
 
-  // Constants for the personalized messages
-  const messages = {
-    charru: "Charru ma’am, your intelligence and guidance in every field-especially technology-always inspires me. Whatever I have achieved is only because of your constant support. Your encouragement is not just help, it's a blessing for me. Thank you for being the strongest pillar behind all my work.",
+  // --- Animation Logic: Burn Crackers / Fireworks ---
+  const triggerCrackerAnimation = () => {
+    const duration = 3000; // Animation lasts 3 seconds
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-    kanika: "Kanika ma’am, thank you so much. I truly enjoyed every moment working with you, and I will miss you a lot. Apart from my parents, I never had a guider like you - you are the first person who supported me this deeply. I have learned so much from you. Before meeting you, I honestly knew very little, but after working with you, I gained knowledge, confidence, and understanding of how to handle projects and situations. Talking to you and working under your guidance has been an amazing experience for me. I never thought I would get such a wonderful mentor in my life. You are truly very special to me. Thank you for supporting me, guiding me, and always believing in me.",
+    const randomInRange = (min, max) => Math.random() * (max - min) + min;
 
-    priyank:"Priyank sir, thank you for giving me such an enriching and memorable experience-whether in real-life learning or while working on the INUP and CBSD projects. Your guidance has truly broadened my perspective and helped me grow both professionally and personally. I’m genuinely grateful for the opportunities and insights you’ve shared.",
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
 
-    kartik: "Kartik sir, thank you so much. From the very first day, I genuinely enjoyed working with you. I was really impressed by your accent - I actually thought, 'Wow!' and became a fan right away. Working with you has been a great experience for me, and I truly had a wonderful time learning from you.",
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
 
-    bhavisha: "Bhavisha ma’am, thank you so much. Working with you has been a truly valuable experience. Our journey began with the dashboard, and at that time I honestly had no idea how to proceed. I created the dashboard with my web skills, but the visualization still wasn’t up to the mark. With your guidance and support, we were able to improve it and make it meaningful. I really learned a lot while working with you. Thank you for your support and for helping me grow.",
-
-    shraddha:"Shraddha ma’am, first of all, thank you so much. I truly enjoyed working with you. And congratulations on your new job - I am genuinely very happy for you. It feels great to know that I now have a senior professor as a friend. Your support has meant a lot to me. Thank you for always being there.",
-
-    lalita:"Lalita ma’am, I truly enjoyed working with you. I learned so much from you throughout our time together, and every moment was a great learning experience for me. Thank you for guiding me and making the work so enjoyable.",
-
-    abin:"Abin sir, I honestly don’t even know where to begin-your ability to do everything with such confidence and skill is truly inspiring. Thank you so much. Working with you always makes me feel energetic and motivated. I really enjoyed the time we worked on the landing page prototype; it became possible only because of your guidance and support. Without you, it wouldn’t have taken shape the way it did. You have an amazing energy, and I pray that you continue to bring that passion to everything you do. Thank you for always supporting and helping me.",
-
-    ayush:"Ayush sir, I truly enjoyed working with you. You introduced me to new technologies and showed me how a website can be made more creative. When I saw the posts you designed, I realized how creative you really are. Working with you was a great experience for me, and I learned a lot from your approach and ideas.",
-
-    adya:"Adya Sharma, you are truly very intelligent, and I really enjoyed working with you. I learned so many things from you, and every moment working together was a great experience. Thank you for all your support and for making the work enjoyable.",
-
-    kartikm: "Kartik Malotia, thank you so much. From our very first conversation, I genuinely liked your nature, and I felt very comfortable talking to you. Spending time and working with you was really enjoyable, and I truly appreciated your positive vibe. It was a great experience being around you.",
-
-    harshita:"Harshita Bisht, you are such a wonderful person, and your creativity in post designing is truly on another level. I really enjoyed working with you and talking with you. It was always fun and enjoyable to be around you."
+      const particleCount = 50 * (timeLeft / duration);
+      
+      // Since particles fall, we spawn them from two sides to look like fireworks
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
   };
 
   const handleOpenGift = () => {
+    // 1. Trigger the Fireworks/Cracker animation
+    triggerCrackerAnimation();
+
+    // 2. Show the cake after a tiny delay so they see the start of the fireworks first
     if (!isCakeVisible) {
-      setIsCakeVisible(true);
+      setTimeout(() => {
+        setIsCakeVisible(true);
+      }, 300); // 300ms delay for visual effect
     }
   };
 
   const handleCutCake = () => {
+    // Optional: Add a small "pop" effect when cutting cake too
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
     setIsMessageModalOpen(true);
   };
 
@@ -82,24 +89,39 @@ const App = () => {
   };
   
   const handleProceed = () => {
-    setShowCoverPage(false); // Hide the cover page to start the sliding transition
+    setShowCoverPage(false); 
+  };
+
+  // Constants for the personalized messages
+  const messages = {
+    charru: "Charru ma’am, your intelligence and guidance in every field-especially technology-always inspires me. Whatever I have achieved is only because of your constant support. Your encouragement is not just help, it's a blessing for me. Thank you for being the strongest pillar behind all my work.",
+    kanika: "Kanika ma’am, thank you so much. I truly enjoyed every moment working with you, and I will miss you a lot. Apart from my parents, I never had a guider like you - you are the first person who supported me this deeply. I have learned so much from you. Before meeting you, I honestly knew very little, but after working with you, I gained knowledge, confidence, and understanding of how to handle projects and situations. Talking to you and working under your guidance has been an amazing experience for me. I never thought I would get such a wonderful mentor in my life. You are truly very special to me. Thank you for supporting me, guiding me, and always believing in me.",
+    priyank:"Priyank sir, thank you for giving me such an enriching and memorable experience-whether in real-life learning or while working on the INUP and CBSD projects. Your guidance has truly broadened my perspective and helped me grow both professionally and personally. I’m genuinely grateful for the opportunities and insights you’ve shared.",
+    kartik: "Kartik sir, thank you so much. From the very first day, I genuinely enjoyed working with you. I was really impressed by your accent - I actually thought, 'Wow!' and became a fan right away. Working with you has been a great experience for me, and I truly had a wonderful time learning from you.",
+    bhavisha: "Bhavisha ma’am, thank you so much. Working with you has been a truly valuable experience. Our journey began with the dashboard, and at that time I honestly had no idea how to proceed. I created the dashboard with my web skills, but the visualization still wasn’t up to the mark. With your guidance and support, we were able to improve it and make it meaningful. I really learned a lot while working with you. Thank you for your support and for helping me grow.",
+    shraddha:"Shraddha ma’am, first of all, thank you so much. I truly enjoyed working with you. And congratulations on your new job - I am genuinely very happy for you. It feels great to know that I now have a senior professor as a friend. Your support has meant a lot to me. Thank you for always being there.",
+    lalita:"Lalita ma’am, I truly enjoyed working with you. I learned so much from you throughout our time together, and every moment was a great learning experience for me. Thank you for guiding me and making the work so enjoyable.",
+    abin:"Abin sir, I honestly don’t even know where to begin-your ability to do everything with such confidence and skill is truly inspiring. Thank you so much. Working with you always makes me feel energetic and motivated. I really enjoyed the time we worked on the landing page prototype; it became possible only because of your guidance and support. Without you, it wouldn’t have taken shape the way it did. You have an amazing energy, and I pray that you continue to bring that passion to everything you do. Thank you for always supporting and helping me.",
+    parishrut:"Parishrut sir, you are truly an exceptional AI expert. Your depth of knowledge feels on another level, and it has been an honour for me to work with someone who is a founder and such a visionary. I genuinely enjoyed working with you, and I learned so much-from how to use AI tools effectively to understanding their benefits and limitations. Thank you so much for guiding me. My experience working with you has been truly wonderful, and I’m grateful for everything I learned from you",
+    ayush:"Ayush sir, I truly enjoyed working with you. You introduced me to new technologies and showed me how a website can be made more creative. When I saw the posts you designed, I realized how creative you really are. Working with you was a great experience for me, and I learned a lot from your approach and ideas.",
+    adya:"Adya Sharma, you are truly very intelligent, and I really enjoyed working with you. I learned so many things from you, and every moment working together was a great experience. Thank you for all your support and for making the work enjoyable.",
+    kartikm: "Kartik Malotia, thank you so much. From our very first conversation, I genuinely liked your nature, and I felt very comfortable talking to you. Spending time and working with you was really enjoyable, and I truly appreciated your positive vibe. It was a great experience being around you.",
+    harshita:"Harshita Bisht, you are such a wonderful person, and your creativity in post designing is truly on another level. I really enjoyed working with you and talking with you. It was always fun and enjoyable to be around you.",
+    gopi:"Gopi sir, thank you so much. I still remember our first conversation-it was really nice. Our first interaction happened during the office order, when I spoke to you in Hindi, and you mentioned that you find it a bit difficult to understand Hindi. Then I explained everything to you in English, and that moment has stayed with me. I truly enjoy working with you and communicating with you. It has always been a pleasant and enjoyable experience.",
+    siddanth:"Siddanth, you are truly an expert in cyber security. Your knowledge is impressive, and the way you create presentations and concept notes is both clear and very creative. I’ve genuinely admired your skills and the way you explain technical things so effectively."
   };
 
   return (
-    // Fragment used to hold the custom styles and the main component structure
     <>
       <style>
         {`
-        /* Import Google Font for the cursive/script style */
         @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 
-        /* Define a custom class for the script font */
         .font-script {
             font-family: 'Great Vibes', cursive;
-            line-height: 1.5; /* Adjusted for better script readability */
+            line-height: 1.5;
         }
         
-        /* Animation for the gift box area to only fade in once typing is complete */
         @keyframes fadeIn {
             0% { opacity: 0; }
             100% { opacity: 1; }
@@ -107,21 +129,18 @@ const App = () => {
         .animate-fadeIn {
             animation: fadeIn 1s ease-out;
         }
-        /* Pulse for the typing cursor */
         .animate-pulse-slow {
             animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
-        /* Ensure the main body takes the full screen height for a consistent background */
         html, body, #root {
             height: 100%;
             margin: 0;
             padding: 0;
         }
 
-        /* Responsive background to fill the screen */
         .main-background {
-            background-color: #f7fafc; /* Light gray/off-white background */
+            background-color: #f7fafc; 
             min-height: 100vh;
         }
         `}
@@ -140,7 +159,6 @@ const App = () => {
                   A Special Gift for All
               </h1>
               
-              {/* Image Container */}
               <div className="w-full h-48 sm:h-64 bg-indigo-800 rounded-xl overflow-hidden border-4 border-yellow-300">
                   <img 
                       src={coverImageUrl} 
@@ -157,7 +175,6 @@ const App = () => {
                   Click below to view the heartfelt message and surprise.
               </p>
 
-              {/* Button to Slide Page */}
               <button
                   onClick={handleProceed}
                   className="mt-6 flex items-center justify-center mx-auto space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 text-lg sm:text-xl font-bold rounded-full bg-pink-500 text-white shadow-xl hover:bg-pink-600 transition duration-300 transform hover:scale-105"
@@ -169,23 +186,20 @@ const App = () => {
       </div>
 
       
-      {/* Main Website Content (Visible when cover page slides out) */}
+      {/* Main Website Content */}
       <div className="main-background min-h-screen flex flex-col items-center justify-start pt-10 pb-20 p-4">
         
-        {/* Main Heading - Removed shadow-lg and border-gray-200 */}
         <div className="w-full max-w-lg md:max-w-4xl text-center mb-10">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-script font-semibold text-indigo-800 leading-snug p-4">
             {displayedHeaderText}
-            {/* Blinking Cursor */}
             {!typingComplete && !showCoverPage && <span className="animate-pulse-slow">|</span>}
           </h1>
         </div>
 
-        {/* Gift Box / Cake Display Area - Only visible after typing is complete */}
+        {/* Gift Box / Cake Display Area */}
         {typingComplete && (
           <div className="flex flex-col items-center justify-center space-y-6 sm:space-y-8 p-6 animate-fadeIn w-full max-w-sm">
 
-            {/* Content controlled by isCakeVisible state */}
             {!isCakeVisible ? (
               /* Gift Box */
               <div className="flex flex-col items-center">
@@ -200,10 +214,9 @@ const App = () => {
               </div>
             ) : (
               /* Cake Display */
-              <div className="flex flex-col items-center space-y-6">
+              <div className="flex flex-col items-center space-y-6 animate-fadeIn">
                 <p className="text-xl sm:text-2xl font-bold text-gray-800">A special cake, just for you!</p>
                 
-                {/* Simple Cake Visual using Emoji/SVG */}
                 <div className="relative p-4 bg-yellow-100">
                     <Cake className="w-24 h-24 sm:w-32 sm:h-32 text-red-500" />
                     <div className="text-5xl sm:text-6xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none" style={{ filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.9))' }}>
@@ -211,7 +224,6 @@ const App = () => {
                     </div>
                 </div>
 
-                {/* Cut Cake Button */}
                 <button
                   onClick={handleCutCake}
                   className="flex items-center space-x-2 bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300 text-sm sm:text-base"
@@ -225,10 +237,9 @@ const App = () => {
         )}
 
 
-        {/* Message Modal (Pop-up) */}
+        {/* Message Modal */}
         {isMessageModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm p-4">
-            {/* Modal Content - Increased max-width for better desktop readability, responsive padding */}
             <div className="bg-white rounded-3xl w-full max-w-xl md:max-w-3xl lg:max-w-4xl p-6 sm:p-8 md:p-10 transform transition-all duration-300 scale-100 opacity-100 border-4 border-yellow-500">
               
               <div className="flex justify-between items-start mb-6">
@@ -242,13 +253,9 @@ const App = () => {
                 </button>
               </div>
 
-              {/* Message Scroll Container - Responsive height */}
               <div className="space-y-6 sm:space-y-8 max-h-[80vh] sm:max-h-[75vh] overflow-y-auto pr-2">
                 
-                {/* Helper function to render a message card */}
                 {Object.entries(messages).map(([key, message]) => {
-                  
-                  // Get placeholder image URL based on key or use a generic one
                   let imageUrl = '';
                   let displayName = '';
                   
@@ -266,7 +273,6 @@ const App = () => {
                           displayName = "Priyank Sir";
                           break;
                       case 'kartik':
-                          // Used a generic LinkedIn profile image
                           imageUrl = "https://media.licdn.com/dms/image/v2/C4E03AQHDiGLaFhQuzg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1650357631164?e=1765411200&v=beta&t=VvCax3u2wNqFTDlDWxauuWKyuEWTFgzLVEFkia5szZA";
                           displayName = "Kartik Sir";
                           break;
@@ -286,8 +292,11 @@ const App = () => {
                           imageUrl = "https://i.postimg.cc/8cqcDqWT/image.png";
                           displayName = "Abin Sir";
                           break;
+                      case 'parishrut':
+                          imageUrl = "https://media.licdn.com/dms/image/v2/D5603AQHAq0QkfMkmrw/profile-displayphoto-crop_800_800/B56ZliggF.KAAI-/0/1758294313724?e=1765411200&v=beta&t=aYtJzB69uae220U6K0VFGVhKpyW5OVX965YE7mFMdsw";
+                          displayName = "Parishrut Sir";
+                          break;
                       case 'ayush':
-                          // Used a generic LinkedIn profile image
                           imageUrl = "https://media.licdn.com/dms/image/v2/D5603AQEM3UnjXMH1Ug/profile-displayphoto-crop_800_800/B56Zno79IYJ8AI-/0/1760549661845?e=1765411200&v=beta&t=-XBYQqaR3VIKLuP_APht63bEYuIjhyirQUY-E-Tvhmg";
                           displayName = "Ayush Sir";
                           break;
@@ -303,27 +312,32 @@ const App = () => {
                           imageUrl = "https://i.postimg.cc/g23dLw9H/Harshita-Negi.jpg";
                           displayName = "Harshita Bisht";
                           break;
+                      case 'gopi':
+                          imageUrl = "https://i.postimg.cc/qMzTFysF/Whats-App-Image-2025-11-24-at-10-03-21-PM.jpg";
+                          displayName = "Gopikrishnan";
+                          break;
+                      case 'siddanth':
+                          imageUrl = "https://i.postimg.cc/kgCdgzrt/image.png";
+                          displayName = "Siddanth";
+                          break;
                       default:
                           displayName = key.charAt(0).toUpperCase() + key.slice(1);
                           imageUrl = "https://placehold.co/40x40/cccccc/000000?text=👤";
                   }
                   
-                  // Use a more dynamic background color for alternating messages for visual appeal
                   const backgroundColor = key === 'charru' || key === 'kanika' ? 'bg-purple-50' : 'bg-teal-50';
 
                   return (
                       <div key={key} className={`p-4 sm:p-5 ${backgroundColor} rounded-lg shadow-md`}>
                           <h3 className="text-lg sm:text-xl font-semibold text-teal-700 mb-3 flex items-center">
-                              {/* Image: w-10 h-10 for fixed size, rounded-full for circular border, object-contain for full visibility */}
                               <img 
                                   className='w-10 h-10 rounded-full mr-3 border-2 border-teal-400 p-0.5 object-contain bg-white' 
                                   src={imageUrl} 
                                   alt={`${displayName}'s profile`} 
-                                  // Fallback for image loading error
                                   onError={(e) => { 
                                       e.target.onerror = null; 
                                       e.target.src="https://placehold.co/40x40/cccccc/000000?text=👤"; 
-                                      e.target.className = 'w-10 h-10 rounded-full mr-3 border-2 border-teal-400 p-1 text-xs'; // Added class for fallback style
+                                      e.target.className = 'w-10 h-10 rounded-full mr-3 border-2 border-teal-400 p-1 text-xs';
                                   }}
                               />
                               <span>{displayName}</span>
