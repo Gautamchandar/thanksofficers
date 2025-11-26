@@ -1,13 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { Gift, Cake, Scissors, X, ArrowRight } from 'lucide-react';
+import { Gift, Cake, Scissors, X, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 // Import the confetti library
 import confetti from 'canvas-confetti';
+
+// --- New: Photo Gallery Component ---
+const PhotoGallery = ({ photos, onClose }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToPrevious = () => {
+    const isFirstSlide = currentIndex === 0;
+    const newIndex = isFirstSlide ? photos.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
+  };
+
+  const goToNext = () => {
+    const isLastSlide = currentIndex === photos.length - 1;
+    const newIndex = isLastSlide ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
+  };
+
+  return (
+    <div className="fixed inset-0 z-60 flex items-center justify-center bg-gray-900 bg-opacity-95 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl w-full max-w-4xl h-full max-h-[90vh] p-4 sm:p-6 shadow-2xl relative">
+        
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 z-10 text-white bg-red-500 rounded-full p-2 shadow-lg hover:bg-red-600 transition"
+          aria-label="Close photo gallery"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        {/* Header */}
+        <div className="text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-indigo-700"> Beautiful Memories </h2>
+            <p className="text-sm text-gray-500">Slide {currentIndex + 1} of {photos.length}</p>
+        </div>
+
+        {/* Image Container */}
+        <div className="relative w-full h-full max-h-[calc(90vh-120px)] overflow-hidden rounded-lg">
+          <img
+            src={photos[currentIndex].url}
+            alt={photos[currentIndex].caption}
+            className="w-full h-full object-contain transition-opacity duration-500"
+          />
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={goToPrevious}
+            className="absolute top-1/2 left-0 transform -translate-y-1/2 p-3 sm:p-4 bg-black bg-opacity-50 text-white rounded-r-lg hover:bg-opacity-75 transition"
+            aria-label="Previous photo"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            onClick={goToNext}
+            className="absolute top-1/2 right-0 transform -translate-y-1/2 p-3 sm:p-4 bg-black bg-opacity-50 text-white rounded-l-lg hover:bg-opacity-75 transition"
+            aria-label="Next photo"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Caption */}
+        <p className="text-center mt-3 text-base sm:text-lg italic text-gray-600 font-medium">
+          {photos[currentIndex].caption}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 
 // Main App Component
 const App = () => {
   const [showCoverPage, setShowCoverPage] = useState(true);
   const [isCakeVisible, setIsCakeVisible] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  // --- New State for Photo Gallery ---
+  const [showGallery, setShowGallery] = useState(false);
   
   // Text for the typing animation
   const fullHeaderText = "First of all, thank you Charru ma’am and Kanika ma’am. You both are truly very special to me, and your constant support means more than words can express. I’m genuinely grateful for everything you’ve done for me. Also, a big thank you to all my seniors who have supported and guided me.";
@@ -86,13 +158,40 @@ const App = () => {
 
   const handleCloseModal = () => {
     setIsMessageModalOpen(false);
+    // --- New: Open the Photo Gallery after closing the messages ---
+    setShowGallery(true); 
   };
   
   const handleProceed = () => {
     setShowCoverPage(false); 
   };
 
-  // Constants for the personalized messages
+  // --- New: Photo Collection Data ---
+  const photoCollection = [
+      { url: "https://i.postimg.cc/SNM6zRGd/image.png" },
+      { url: "https://i.postimg.cc/pVg0SgG1/image.png"},
+      { url: "https://i.postimg.cc/SQzdcgSS/image.png"},
+      { url: "https://i.postimg.cc/65rhmTG8/image.png"},
+      { url: "https://i.postimg.cc/N0z8HHZd/image.png"},
+      { url: "https://i.postimg.cc/W31K2ggm/image.png"},
+      { url: "https://i.postimg.cc/CLq2LFBX/image.png"},
+      { url: "https://i.postimg.cc/Y0md939Q/image.png"},
+      { url: "https://i.postimg.cc/N0Ch2dgC/image.png"},
+      { url: "https://i.postimg.cc/J4LFnfNy/image.png"},
+      { url: "https://i.postimg.cc/Wbfsxmqt/image.png"},
+      { url: "https://i.postimg.cc/Jhjmy964/image.png"},
+      { url: "https://i.postimg.cc/ZnshtZRy/image.png"},
+      { url: "https://i.postimg.cc/g0M96myG/image.png"},
+      // **IMPORTANT:** Replace these placeholder URLs with your actual photo links!
+      // Example of adding a new photo:
+      // { url: "YOUR_PHOTO_URL_HERE", caption: "A quick meeting snap." },
+  ];
+
+  const handleCloseGallery = () => {
+      setShowGallery(false);
+  };
+  
+  // Constants for the personalized messages (keeping this section condensed for brevity)
   const messages = {
     charru: "Charru ma’am, your intelligence and guidance in every field-especially technology-always inspires me. Whatever I have achieved is only because of your constant support. Your encouragement is not just help, it's a blessing for me. Thank you for being the strongest pillar behind all my work.",
     kanika: "Kanika ma’am, thank you so much. I truly enjoyed every moment working with you, and I will miss you a lot. Apart from my parents, I never had a guider like you - you are the first person who supported me this deeply. I have learned so much from you. Before meeting you, I honestly knew very little, but after working with you, I gained knowledge, confidence, and understanding of how to handle projects and situations. Talking to you and working under your guidance has been an amazing experience for me. I never thought I would get such a wonderful mentor in my life. You are truly very special to me. Thank you for supporting me, guiding me, and always believing in me.",
@@ -110,6 +209,7 @@ const App = () => {
     gopi:"Gopi sir, thank you so much. I still remember our first conversation-it was really nice. Our first interaction happened during the office order, when I spoke to you in Hindi, and you mentioned that you find it a bit difficult to understand Hindi. Then I explained everything to you in English, and that moment has stayed with me. I truly enjoy working with you and communicating with you. It has always been a pleasant and enjoyable experience.",
     siddanth:"Siddanth, you are truly an expert in cyber security. Your knowledge is impressive, and the way you create presentations and concept notes is both clear and very creative. I’ve genuinely admired your skills and the way you explain technical things so effectively."
   };
+
 
   return (
     <>
@@ -197,7 +297,7 @@ const App = () => {
         </div>
 
         {/* Gift Box / Cake Display Area */}
-        {typingComplete && (
+        {typingComplete && !isMessageModalOpen && !showGallery && (
           <div className="flex flex-col items-center justify-center space-y-6 sm:space-y-8 p-6 animate-fadeIn w-full max-w-sm">
 
             {!isCakeVisible ? (
@@ -258,7 +358,7 @@ const App = () => {
                 {Object.entries(messages).map(([key, message]) => {
                   let imageUrl = '';
                   let displayName = '';
-                  
+                  // ... (Image URL and Display Name logic is the same) ...
                   switch (key) {
                       case 'charru':
                           imageUrl = "https://pbs.twimg.com/profile_images/1317083547719540736/i1H9o16A_400x400.jpg";
@@ -273,7 +373,7 @@ const App = () => {
                           displayName = "Priyank Sir";
                           break;
                       case 'kartik':
-                          imageUrl = "https://media.licdn.com/dms/image/v2/C4E03AQHDiGLaFhQuzg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1650357631164?e=1765411200&v=beta&t=VvCax3u2wNqFTDlDWxauuWKyuEWTFgzLVEFkia5szZA";
+                          imageUrl = "https://media.licdn.com/dms/image/v2/C4E03AQHDiGLaFhQuzg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1650357631164?e=1765411200&v=beta&t=VvCax3u2wNqFTDlDWxauuWKyuEWTFgzLVEKkia5szZA";
                           displayName = "Kartik Sir";
                           break;
                       case 'bhavisha':
@@ -356,12 +456,21 @@ const App = () => {
                       onClick={handleCloseModal}
                       className="bg-yellow-500 text-gray-800 font-bold py-2 px-6 rounded-full hover:bg-yellow-600 transition duration-300 shadow-lg transform hover:scale-105"
                   >
-                      Close Messages
+                      View Photos Surprise! 🖼️
                   </button>
               </div>
             </div>
           </div>
         )}
+        
+        {/* --- New: Photo Gallery Display --- */}
+        {showGallery && (
+            <PhotoGallery 
+                photos={photoCollection} 
+                onClose={handleCloseGallery} 
+            />
+        )}
+        
       </div>
     </>
   );
